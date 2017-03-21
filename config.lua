@@ -1,0 +1,5 @@
+AP_SSID = 'Accesspoint SSID'
+AP_PASSWORD = 'Accesspoint Password'
+API_URL = 'The url of your jenkins api in JSON'
+JENKINS_USERNAME = 'Your Jenkins Username'
+JENKINS_PASSWORD = 'Your Jenkins Password'
