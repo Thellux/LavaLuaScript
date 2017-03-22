@@ -1,5 +1,5 @@
 AP_SSID = 'Accesspoint SSID'
 AP_PASSWORD = 'Accesspoint Password'
-API_URL = 'The url of your jenkins api in JSON'
+API_URL = 'http://Host:Port/lava/api/json'
 JENKINS_USERNAME = 'Your Jenkins Username'
 JENKINS_PASSWORD = 'Your Jenkins Password'
