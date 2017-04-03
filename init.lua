@@ -47,26 +47,62 @@ end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+function daylightSaving()
+      if (tm["mon"] < 03 or tm["mon"] > 10) then
+        return false
+      end
+      if (tm["mon"] > 03 and tm["mon"] < 10) then
+        return true
+      end
+      
+      local wdayNew = tm["wday"]
+      if (tm["wday"] == 01) then
+        wdayNew = 07
+      else
+        wdayNew = tm["wday"] -1
+      end
+      
+      local previousSunday = tm["day"] - wdayNew;
+      if (tm["mon"] == 03) then
+        return previousSunday >= 25
+      end
+      if (tm["mon"] == 10) then
+        return previousSunday < 25
+      end
+    end
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function checkTime(sck)
   local permanentStatus = table.buildSuccess                                                                                                                  -- Permanent status variable to check the last status of build success
   local changedStatus = false                                                                                                                                 -- Set to true if last build success was different than the one before
   tmr.alarm(0,1000,tmr.ALARM_AUTO,function()                                                                                                                  -- Repeating timer
     tm = rtctime.epoch2cal(rtctime.get())                                                                                                                     -- Gets a time table with todays date calculated from 01.01.1970
-    print(tm["isdst"])                                                                                                                                        -- Prints nil if daylight saving is on, prints 1 if daylight saving is off
-    if (tm["isdst"] == nil) then                                                                                                                              -- Checks daylight saving
-      tm["hour"] = tm["hour"]+1                                                                                                                               -- If daylight saving is on it sets the hours to +1
-    end                                                                                                                                                       
+
+    if (daylightSaving() == true) then
+      tm["hour"] = tm["hour"] + 2
+    elseif (daylightSaving() == false) then
+      tm["hour"] = tm["hour"] + 1
+    else
+      print("daylightsaving returns nil, unexpected error")
+    end
     print(string.format("%04d/%02d/%02d %02d:%02d:%02d %02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"], tm["wday"]))                -- Prints todays date and time plus weekday
     if (tm["wday"] == 01) then                                                                                                                                -- Checks if it is sunday
       print("It is weekend, no need to check the job statuses")
+      resetPins()
     elseif (tm["wday"] == 07) then                                                                                                                            -- Checks if it is friday
       print("It is weekend, no need to check the job statuses")
+      resetPins()
     else                                                                                                                                                      -- Should only activate if it is monday to friday
       if (tm["hour"] > 07) then                                                                                                                               -- Checks if it is 8am or later
-        if (tm["hour"] < 16) then                                                                                                                             -- Checks if it is 4pm or earlier
+        if (tm["hour"] < 17) then                                                                                                                             -- Checks if it is 5pm or earlier
           updateLamp()                                                                                                                                        -- See updateLamp() below for more information
+        else
+          resetPins()
+        end
+      else
+        resetPins()
       end
-    end
     end
   end)
 end
